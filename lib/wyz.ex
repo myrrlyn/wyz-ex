@@ -1,18 +1,10 @@
 defmodule Wyz do
   @moduledoc """
-  Documentation for `Wyz`.
+  A collection of utility modules I think is useful.
   """
 
-  @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> Wyz.hello()
-      :world
-
+  @typedoc """
+  Syntax sugar for the `{:ok, val}` or `{:error, err}` customary tuples.
   """
-  def hello do
-    :world
-  end
+  @type result(t, e) :: {:ok, t} | {:error, e}
 end

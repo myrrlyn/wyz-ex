@@ -1,6 +1,13 @@
 # Wyz
 
-**TODO: Add description**
+This is a collection of modules that I find useful and have probably torn out of
+other projects when I discovered I needed to re-use them.
+
+## Contents
+
+- `Markdown`: specialized Markdown renderer. This wraps `Earmark` and also
+  produces a structured table of contents. It will gain other functionality
+  (such as YAML frontmatter) as I extract it from my websites.
 
 ## Installation
 
