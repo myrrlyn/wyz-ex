@@ -28,7 +28,7 @@ defmodule Wyz.Markdown do
   def render(source, levels \\ 1..6) do
     opts =
       case Application.fetch_env(:wyz, :markdown) do
-        {:ok, opts} -> opts |> Map.new()
+        {:ok, opts} -> opts |> Keyword.delete(:unescaped_tags) |> Map.new()
         :error -> @opts |> Map.from_struct()
       end
 
@@ -40,7 +40,7 @@ defmodule Wyz.Markdown do
     after
       {ast, _} = Earmark.Transform.map_ast_with(ast, %{}, &walker/2)
       toc_tree = Task.async(fn -> build_toc(ast, levels) end)
-      html = Task.async(fn -> Earmark.Transform.transform(ast, opts) end)
+      html = Task.async(fn -> Earmark.Transform.transform(ast, opts) |> restore_tags() end)
 
       {Task.await(html, :infinity), Task.await(toc_tree, :infinity), messages}
     end
@@ -310,5 +310,29 @@ defmodule Wyz.Markdown do
     else
       [{head, toc_tree(rest)}]
     end
+  end
+
+  @doc """
+  Un-escapes certain tags. Does not support attributes in those tags.
+
+  This is not aware of context, and replaces *all* escaped tag instances.
+  """
+  @spec restore_tags(String.t()) :: String.t()
+  def restore_tags(html) do
+    tags =
+      case Application.fetch_env(:wyz, :markdown) do
+        {:ok, cfg} -> cfg
+        :error -> Keyword.new()
+      end
+      |> Keyword.get(:unescaped_tags, [])
+      |> Enum.join("|")
+
+    re = ~r/&lt;(?<c>\/)?(?<t>#{tags})&gt;/
+
+    Regex.replace(
+      re,
+      html,
+      "<\\1\\2>"
+    )
   end
 end
