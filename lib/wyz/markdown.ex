@@ -21,7 +21,7 @@ defmodule Wyz.Markdown do
   Renders some Markdown, producing both HTML and a structured table of contents.
   """
   @spec render(String.t(), Range.t(1, 6)) ::
-          Wyz.result(
+          Wyz.Maybe.result(
             {String.t(), Heading.tree(), [{atom(), number(), String.t()}]},
             {any(), [{atom(), number(), String.t()}]}
           )
@@ -50,8 +50,8 @@ defmodule Wyz.Markdown do
   Translates Earmark's `{status, output, messages}` into
   `{status, {output, messages}}`.
   """
-  @spec parse_markdown(String.t(), Earmark.Options.t()) ::
-          Wyz.result({Earmark.ast(), [String.t()]}, any())
+  @spec parse_markdown(String.t(), %Earmark.Options{}) ::
+          Wyz.Maybe.result({Earmark.ast(), [String.t()]}, any())
   def parse_markdown(source, opts \\ @opts) do
     case EarmarkParser.as_ast(source, opts) do
       {status, ast, messages} -> {status, {ast, messages}}
